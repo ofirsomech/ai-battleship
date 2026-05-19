@@ -38,7 +38,7 @@ export default function LobbyPage() {
         </p>
         <p className="text-lg">Room Code:</p>
         <div className="flex items-center gap-2">
-          <code className="text-4xl font-mono bg-gray-800 px-6 py-3 rounded tracking-widest">
+          <code className="text-4xl font-mono text-white bg-gray-800 px-6 py-3 rounded tracking-widest">
             {roomCode}
           </code>
           <button
@@ -71,7 +71,7 @@ export default function LobbyPage() {
         value={name}
         onChange={(e) => setName(e.target.value)}
         maxLength={20}
-        className="px-4 py-2 bg-gray-800 border border-gray-600 rounded w-64 text-center"
+        className="px-4 py-2 text-white placeholder-gray-500 bg-gray-800 border border-gray-600 rounded w-64 text-center"
       />
 
       <Button
@@ -96,7 +96,7 @@ export default function LobbyPage() {
         value={joinCode}
         onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
         maxLength={6}
-        className="px-4 py-2 bg-gray-800 border border-gray-600 rounded w-64 text-center font-mono tracking-widest"
+        className="px-4 py-2 text-white placeholder-gray-500 bg-gray-800 border border-gray-600 rounded w-64 text-center font-mono tracking-widest"
       />
 
       <Button
