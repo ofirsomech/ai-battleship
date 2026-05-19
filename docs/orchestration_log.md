@@ -17,4 +17,4 @@
 | 2026-05-19T13:30:00 | Phase 2 | client-reviewer | dev | Audit ACs + design | REJECT | Missing game:reconnect + components unused |
 | 2026-05-19T13:34:00 | Phase 2 | client-fix | feature/client-fix | Fix cycle 1 | COMPLETED | game:reconnect + components wired + countdown ticking |
 | 2026-05-19T13:36:00 | Phase 2 | requirements-reviewer | dev | Re-audit AC-08 | APPROVED | All 7 criteria pass, countdown now ticks |
-| 2026-05-19T13:38:00 | Phase 2 | orchestrator | dev | Begin QA phase | IN_PROGRESS | Spawning qa-planner |
+| 2026-05-19T13:38:00 | Phase 2 | orchestrator | dev | Auth middleware bug — blocked all new connections | FIXED | client could not create/join rooms

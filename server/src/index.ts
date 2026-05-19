@@ -16,23 +16,22 @@ const io = new Server(httpServer, {
 });
 
 io.use((socket, next) => {
-  const { roomCode, playerId } = socket.handshake.auth as Record<
+  const playerId = `p_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  socket.data.playerId = playerId;
+
+  const { roomCode, playerId: authPlayerId } = socket.handshake.auth as Record<
     string,
     unknown
   >;
 
-  if (typeof roomCode !== "string" || roomCode.length === 0) {
-    return next(new Error("Room code is required"));
-  }
-  if (!/^[A-Z]{4}$/.test(roomCode)) {
-    return next(new Error("Invalid room code"));
-  }
-  if (typeof playerId !== "string" || playerId.length === 0) {
-    return next(new Error("Player ID is required"));
+  if (typeof authPlayerId === "string" && authPlayerId.length > 0) {
+    socket.data.playerId = authPlayerId;
   }
 
-  socket.data.roomCode = roomCode;
-  socket.data.playerId = playerId;
+  if (typeof roomCode === "string" && roomCode.length > 0) {
+    socket.data.roomCode = roomCode;
+  }
+
   next();
 });
 
