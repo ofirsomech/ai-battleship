@@ -3,7 +3,7 @@ import { useGame } from "../state/gameContext";
 import { Button } from "../components/index.js";
 
 export default function LobbyPage() {
-  const { createRoom, joinRoom, roomCode, errorMessage, clearError, isConnected, isWaitingForOpponent, playerCount } = useGame();
+  const { createRoom, joinRoom, roomCode, errorMessage, clearError, isWaitingForOpponent, playerCount } = useGame();
   const [name, setName] = useState("");
   const [joinCode, setJoinCode] = useState("");
 
@@ -76,7 +76,7 @@ export default function LobbyPage() {
 
       <Button
         onClick={handleCreate}
-        disabled={isConnected || !name.trim()}
+        disabled={!name.trim()}
         variant="primary"
         size="lg"
         className="w-64"
@@ -101,7 +101,7 @@ export default function LobbyPage() {
 
       <Button
         onClick={handleJoin}
-        disabled={isConnected || !name.trim() || !joinCode.trim()}
+        disabled={!name.trim() || !joinCode.trim()}
         variant="secondary"
         size="lg"
         className="w-64"

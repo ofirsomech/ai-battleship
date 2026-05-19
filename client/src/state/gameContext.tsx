@@ -89,6 +89,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         if (!response.success) {
           localStorage.removeItem("battleship_room");
           localStorage.removeItem("battleship_player");
+          disconnectSocket();
         }
       });
     }
