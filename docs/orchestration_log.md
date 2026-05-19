@@ -15,4 +15,6 @@
 | 2026-05-19T13:30:00 | Phase 2 | server-reviewer | dev | Audit event contract + security | APPROVED | All 17 events handled, security patterns applied |
 | 2026-05-19T13:30:00 | Phase 2 | requirements-reviewer | dev | Map ACs to code | AC_COV | AC-08 partial (countdown not ticking), 9/10 complete |
 | 2026-05-19T13:30:00 | Phase 2 | client-reviewer | dev | Audit ACs + design | REJECT | Missing game:reconnect + components unused |
-| 2026-05-19T13:32:00 | Phase 2 | client-fix | feature/client-fix | Fix cycle 1 | COMPLETED | game:reconnect + components wired + countdown ticking |
+| 2026-05-19T13:34:00 | Phase 2 | client-fix | feature/client-fix | Fix cycle 1 | COMPLETED | game:reconnect + components wired + countdown ticking |
+| 2026-05-19T13:36:00 | Phase 2 | requirements-reviewer | dev | Re-audit AC-08 | APPROVED | All 7 criteria pass, countdown now ticks |
+| 2026-05-19T13:38:00 | Phase 2 | orchestrator | dev | Begin QA phase | IN_PROGRESS | Spawning qa-planner |
