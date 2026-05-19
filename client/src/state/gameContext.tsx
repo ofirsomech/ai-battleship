@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { connectSocket, disconnectSocket, getSocket } from "./socket";
 import { CellStatus, GamePhase, GRID_SIZE, ShipType } from "shared";
 import type { Cell, Ship, AttackResult } from "shared";
@@ -63,6 +63,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const [playerCount, setPlayerCount] = useState(0);
   const [isWaitingForOpponent, setIsWaitingForOpponent] = useState(false);
   const [lastSunkShip, setLastSunkShip] = useState<ShipType | null>(null);
+  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const handleError = useCallback((msg: string) => {
     setErrorMessage(msg);
@@ -80,17 +81,37 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   playerIdRef.current = playerId;
 
   useEffect(() => {
+    const savedRoom = localStorage.getItem("battleship_room");
+    const savedPlayer = localStorage.getItem("battleship_player");
+    if (savedRoom && savedPlayer) {
+      const socket = connectSocket({ roomCode: savedRoom, playerId: savedPlayer });
+      socket.emit("game:reconnect", { roomCode: savedRoom, playerId: savedPlayer }, (response: { success: boolean; error?: string }) => {
+        if (!response.success) {
+          localStorage.removeItem("battleship_room");
+          localStorage.removeItem("battleship_player");
+        }
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     const socket = getSocket();
 
     const onConnect = () => setIsConnected(true);
     const onDisconnect = () => {
       setIsConnected(false);
       setDisconnectCountdown(null);
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
     };
 
     const onRoomJoined = (data: { roomCode: string; playerId: string; playerCount: number }) => {
       setRoomCode(data.roomCode);
       setPlayerId(data.playerId);
+      localStorage.setItem("battleship_room", data.roomCode);
+      localStorage.setItem("battleship_player", data.playerId);
       setPlayerCount(data.playerCount);
       setPhase(GamePhase.Placement);
       setErrorMessage(null);
@@ -156,14 +177,37 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       setWinnerId(data.winnerId);
       setStats(data.stats);
       setPhase(GamePhase.Finished);
+      localStorage.removeItem("battleship_room");
+      localStorage.removeItem("battleship_player");
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
     };
 
     const onPlayerDisconnected = (data: { countdown: number }) => {
       setDisconnectCountdown(data.countdown);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = setInterval(() => {
+        setDisconnectCountdown((prev) => {
+          if (prev === null || prev <= 1) {
+            if (countdownIntervalRef.current) {
+              clearInterval(countdownIntervalRef.current);
+              countdownIntervalRef.current = null;
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     };
 
     const onPlayerReconnected = () => {
       setDisconnectCountdown(null);
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
     };
 
     const onError = (data: { message: string }) => {
@@ -200,6 +244,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const createRoom = useCallback((name: string) => {
+    localStorage.removeItem("battleship_room");
+    localStorage.removeItem("battleship_player");
     setPlayerName(name);
     setErrorMessage(null);
     const socket = connectSocket();
@@ -209,6 +255,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const joinRoom = useCallback((code: string, name: string) => {
+    localStorage.removeItem("battleship_room");
+    localStorage.removeItem("battleship_player");
     setPlayerName(name);
     setErrorMessage(null);
     const socket = connectSocket();
@@ -268,6 +316,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   );
 
   const leaveRoom = useCallback(() => {
+    localStorage.removeItem("battleship_room");
+    localStorage.removeItem("battleship_player");
     if (roomCode) {
       getSocket().emit("player:leave", { roomCode });
     }
@@ -286,6 +336,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     setPlayerCount(0);
     setIsWaitingForOpponent(false);
     setLastSunkShip(null);
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
   }, [roomCode]);
 
   const value: GameContextType = {

@@ -1,4 +1,5 @@
 import { useGame } from "../state/gameContext";
+import { Button } from "../components/index.js";
 
 export default function GameOverPage() {
   const { winnerId, playerId, stats, playerName, leaveRoom } = useGame();
@@ -36,12 +37,13 @@ export default function GameOverPage() {
         </div>
       )}
 
-      <button
+      <Button
         onClick={leaveRoom}
-        className="px-8 py-3 bg-blue-600 hover:bg-blue-700 rounded text-lg"
+        variant="primary"
+        size="lg"
       >
         Play Again
-      </button>
+      </Button>
     </div>
   );
 }

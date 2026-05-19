@@ -7,6 +7,8 @@ interface CellProps {
   disabled?: boolean;
   showShip?: boolean;
   isTargeted?: boolean;
+  onPointerEnter?: () => void;
+  onPointerLeave?: () => void;
 }
 
 const COLUMN_LABELS = "ABCDEFGHIJ";
@@ -30,6 +32,8 @@ export const Cell: React.FC<CellProps> = ({
   disabled = false,
   showShip = false,
   isTargeted = false,
+  onPointerEnter,
+  onPointerLeave,
 }) => {
   const isClickable = onClick != null && !disabled;
   const { row, col, status } = cell;
@@ -70,6 +74,8 @@ export const Cell: React.FC<CellProps> = ({
           el?.focus();
         }
       }}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
       data-row={row}
       data-col={col}
       className={[

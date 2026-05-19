@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { CellStatus, GamePhase, ShipType, SHIP_SIZES, GRID_SIZE } from "shared";
 import type { Cell, Ship, Position } from "shared";
 import { useGame } from "../state/gameContext";
+import { Grid, ShipPalette, Button } from "../components/index.js";
 
 type ShipPlacementEntry = {
   type: ShipType;
@@ -38,17 +39,6 @@ function isValidPlacement(
   return true;
 }
 
-function getCellColor(status: CellStatus): string {
-  switch (status) {
-    case CellStatus.Empty:
-      return "bg-blue-900 border-blue-700";
-    case CellStatus.Occupied:
-      return "bg-gray-400 border-gray-500";
-    default:
-      return "bg-blue-900 border-blue-700";
-  }
-}
-
 export default function PlacementPage() {
   const { roomCode, playerName, placeShips, setReady, isWaitingForOpponent, errorMessage, clearError } = useGame();
 
@@ -60,7 +50,6 @@ export default function PlacementPage() {
   const [hoverValid, setHoverValid] = useState(true);
 
   const placedTypes = new Set(placedShips.map((s) => s.type));
-  const unplacedShips = Object.values(ShipType).filter((t) => !placedTypes.has(t));
 
   const handleCellClick = useCallback(
     (row: number, col: number) => {
@@ -165,6 +154,28 @@ export default function PlacementPage() {
 
   const hoverSet = new Set(hoverCells.map((p) => `${p.row},${p.col}`));
 
+  const displayGrid: Cell[][] = grid.map((row) =>
+    row.map((cell) => {
+      const isHover = hoverSet.has(`${cell.row},${cell.col}`);
+      if (isHover && hoverValid && cell.status === CellStatus.Empty) {
+        return { ...cell, status: CellStatus.Occupied, shipId: "preview" };
+      }
+      return cell;
+    })
+  );
+
+  const paletteShips: Ship[] = Object.values(ShipType).map((type) => {
+    const placed = placedShips.find((s) => s.type === type);
+    return {
+      id: type,
+      type,
+      size: SHIP_SIZES[type],
+      position: placed ? placed.positions : [],
+      hits: placed ? new Array(placed.positions.length).fill(false) : [],
+      sunk: false,
+    };
+  });
+
   return (
     <div className="flex flex-col items-center gap-6 p-8">
       <h1 className="text-3xl font-bold">Place Your Ships</h1>
@@ -179,77 +190,65 @@ export default function PlacementPage() {
         </div>
       )}
 
-      {/* Ship Palette */}
-      <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-gray-400 mr-2">Your Ships:</span>
-        {unplacedShips.map((type) => (
-          <button
-            key={type}
-            onClick={() =>
-              setSelectedShip(selectedShip === type ? null : type)
+      <div className="flex flex-wrap items-start gap-8 justify-center">
+        <ShipPalette
+          ships={paletteShips}
+          selectedShipType={selectedShip}
+          onSelectShip={(type) => {
+            if (selectedShip === type) {
+              setSelectedShip(null);
+            } else if (!placedTypes.has(type)) {
+              setSelectedShip(type);
             }
-            className={`px-4 py-2 rounded text-sm border ${
-              selectedShip === type
-                ? "bg-yellow-500 text-black border-yellow-600"
-                : "bg-gray-700 border-gray-600 hover:bg-gray-600"
-            }`}
+          }}
+          vertical={!isHorizontal}
+        />
+
+        <div className="flex flex-col gap-3">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setIsHorizontal((p) => !p)}
           >
-            {type} ({SHIP_SIZES[type]})
-          </button>
-        ))}
-        <button
-          onClick={() => setIsHorizontal((p) => !p)}
-          className="px-4 py-2 rounded text-sm bg-gray-700 border border-gray-600 hover:bg-gray-600"
-        >
-          Rotate: {isHorizontal ? "Horizontal" : "Vertical"}
-        </button>
-      </div>
+            Rotate: {isHorizontal ? "Horizontal" : "Vertical"}
+          </Button>
 
-      {/* Placed Ships List */}
-      {placedShips.length > 0 && (
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-gray-400">Placed:</span>
-          {placedShips.map((s) => (
-            <button
-              key={s.type}
-              onClick={() => handleRemoveShip(s.type)}
-              className="px-3 py-1 rounded text-sm bg-green-700 border border-green-600 hover:bg-red-700"
-              title="Click to remove"
-            >
-              {s.type}
-            </button>
-          ))}
+          <Grid
+            cells={displayGrid}
+            onCellClick={handleCellClick}
+            interactive={true}
+            showShips={true}
+            label="Your Fleet"
+            onCellHover={handleCellHover}
+            onCellHoverEnd={() => setHoverCells([])}
+          />
+
+          {placedShips.length > 0 && (
+            <div className="flex flex-wrap gap-2 items-center justify-center">
+              <span className="text-gray-400 text-sm">Placed:</span>
+              {placedShips.map((s) => (
+                <button
+                  key={s.type}
+                  onClick={() => handleRemoveShip(s.type)}
+                  className="px-3 py-1 rounded text-sm bg-green-700 border border-green-600 hover:bg-red-700"
+                  title="Click to remove"
+                >
+                  {s.type}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <Button
+            variant="primary"
+            size="lg"
+            disabled={!allPlaced}
+            onClick={handleReady}
+          >
+            Ready
+          </Button>
         </div>
-      )}
-
-      {/* Grid */}
-      <div className="grid grid-cols-10 gap-0.5 w-fit">
-        {grid.flat().map((cell) => {
-          const isHover = hoverSet.has(`${cell.row},${cell.col}`);
-          const bg = isHover
-            ? hoverValid
-              ? "bg-green-500 border-green-400"
-              : "bg-red-500 border-red-400"
-            : getCellColor(cell.status);
-          return (
-            <button
-              key={`${cell.row}-${cell.col}`}
-              className={`w-10 h-10 border ${bg} transition-colors`}
-              onClick={() => handleCellClick(cell.row, cell.col)}
-              onMouseEnter={() => handleCellHover(cell.row, cell.col)}
-              onMouseLeave={() => setHoverCells([])}
-            />
-          );
-        })}
       </div>
-
-      <button
-        onClick={handleReady}
-        disabled={!allPlaced}
-        className="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed rounded text-lg"
-      >
-        Ready
-      </button>
     </div>
   );
 }

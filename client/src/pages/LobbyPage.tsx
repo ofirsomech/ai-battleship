@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useGame } from "../state/gameContext";
+import { Button } from "../components/index.js";
 
 export default function LobbyPage() {
   const { createRoom, joinRoom, roomCode, errorMessage, clearError, isConnected, isWaitingForOpponent, playerCount } = useGame();
@@ -73,13 +74,15 @@ export default function LobbyPage() {
         className="px-4 py-2 bg-gray-800 border border-gray-600 rounded w-64 text-center"
       />
 
-      <button
+      <Button
         onClick={handleCreate}
         disabled={isConnected || !name.trim()}
-        className="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed rounded text-lg w-64"
+        variant="primary"
+        size="lg"
+        className="w-64"
       >
         Create Room
-      </button>
+      </Button>
 
       <div className="flex items-center gap-2 text-gray-400">
         <div className="h-px w-20 bg-gray-600" />
@@ -96,13 +99,15 @@ export default function LobbyPage() {
         className="px-4 py-2 bg-gray-800 border border-gray-600 rounded w-64 text-center font-mono tracking-widest"
       />
 
-      <button
+      <Button
         onClick={handleJoin}
         disabled={isConnected || !name.trim() || !joinCode.trim()}
-        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded text-lg w-64"
+        variant="secondary"
+        size="lg"
+        className="w-64"
       >
         Join Room
-      </button>
+      </Button>
     </div>
   );
 }

@@ -11,3 +11,8 @@
 | 2026-05-19T13:28:00 | Phase 2 | server-dev | feature/server-dev | Express + Socket.IO handlers | COMPLETED | All 7C→S + 10S→C events, api-security patterns applied |
 | 2026-05-19T13:28:00 | Phase 2 | client-dev | feature/client-dev | React app + state management | COMPLETED | 4 phases, Socket.IO integration, GameContext |
 | 2026-05-19T13:28:00 | Phase 2 | template-dev | feature/template-dev | Tailwind UI components | COMPLETED | 8 components, maritime theme, ARIA, keyboard nav |
+| 2026-05-19T13:30:00 | Phase 2 | db-reviewer | dev | Audit domain logic | APPROVED | Pure functions, 43 tests, all rules verified |
+| 2026-05-19T13:30:00 | Phase 2 | server-reviewer | dev | Audit event contract + security | APPROVED | All 17 events handled, security patterns applied |
+| 2026-05-19T13:30:00 | Phase 2 | requirements-reviewer | dev | Map ACs to code | AC_COV | AC-08 partial (countdown not ticking), 9/10 complete |
+| 2026-05-19T13:30:00 | Phase 2 | client-reviewer | dev | Audit ACs + design | REJECT | Missing game:reconnect + components unused |
+| 2026-05-19T13:32:00 | Phase 2 | client-fix | feature/client-fix | Fix cycle 1 | COMPLETED | game:reconnect + components wired + countdown ticking |

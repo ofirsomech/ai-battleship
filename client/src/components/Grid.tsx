@@ -8,6 +8,8 @@ interface GridProps {
   interactive?: boolean;
   showShips?: boolean;
   label: string;
+  onCellHover?: (row: number, col: number) => void;
+  onCellHoverEnd?: () => void;
 }
 
 const COLUMN_LABELS = "ABCDEFGHIJ";
@@ -19,6 +21,8 @@ export const Grid: React.FC<GridProps> = ({
   interactive = false,
   showShips = false,
   label,
+  onCellHover,
+  onCellHoverEnd,
 }) => {
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -121,6 +125,10 @@ export const Grid: React.FC<GridProps> = ({
                   disabled={!isCellInteractive}
                   showShip={isOccupiedShip}
                   isTargeted={isCellInteractive}
+                  onPointerEnter={
+                    onCellHover ? () => onCellHover(cell.row, cell.col) : undefined
+                  }
+                  onPointerLeave={onCellHoverEnd}
                 />
               );
             })}
