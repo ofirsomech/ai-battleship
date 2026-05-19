@@ -146,6 +146,16 @@ export default function PlacementPage() {
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
         <h1 className="text-3xl font-bold">Waiting for Opponent</h1>
         <p className="text-lg text-gray-400">
+          Room Code:
+          <br />
+          <code className="text-4xl font-mono text-white bg-gray-800 px-6 py-2 rounded tracking-widest">
+            {roomCode}
+          </code>
+        </p>
+        <p className="text-lg text-gray-400">
+          Share this code with your opponent to join.
+        </p>
+        <p className="text-sm text-gray-500">
           Your ships are placed. Waiting for opponent to finish...
         </p>
       </div>
